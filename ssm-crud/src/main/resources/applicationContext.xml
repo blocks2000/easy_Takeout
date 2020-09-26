@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+<!-- 主要配置和业务逻辑相关的 -->
+<!-- 数据源，mapper实例化。事务控制..... -->
+
+	<!-- 扫描除了controller控制器的其他组件 -->
+	<context:component-scan base-package="org.lanqiao">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+	</context:component-scan>
+
+	<!-- 加载db.properties文件-->
+	<context:property-placeholder location="classpath:db.properties"/>
+
+	<!-- 配置数据源信息 -->
+	<bean id="PooledDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="jdbcUrl" value="${jdbc.jdbcUrl}"></property>
+		<property name="driverClass" value="${jdbc.driverClass}"></property>
+		<property name="user" value="${jdbc.user}"></property>
+		<property name="password" value="${jdbc.password}"></property>
+	</bean>
+
+	<!-- 配置sqlsessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="PooledDataSource"></property>
+		<property name="configLocation" value="classpath:mybatis-config.xml"></property>
+		<property name="mapperLocations" value="classpath:mapper/*.xml"></property>
+	</bean>
+	
+	<!-- 批量产生mapper动态代理对象，并把sqlSessionFactory交给spring来管理 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="org.lanqiao.mapper"></property>
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+	</bean>
+	
+	<!-- 配置一个可以执行批量操作的sqlSession -->
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"></constructor-arg>
+		<constructor-arg name="executorType" value="BATCH"></constructor-arg>
+	</bean>
+	<!-- 事务控制的配置 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<!-- 控制住数据源 -->
+		<property name="dataSource" ref="PooledDataSource"></property>
+	</bean>
+	
+	<!-- 开启基于注解的事务，或者使用xml配置形式的事务（一般来说比较重要的时候都用配置形式） -->
+	<!-- 切入点表达式，要切入哪些地方 -->
+	<aop:config proxy-target-class="true">
+		<aop:pointcut expression="execution(* org.lanqiao.service.impl..*(..))" id="txPoint"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPoint"/>
+	</aop:config>
+	
+	<!-- 配置事务增强，事务如何切入 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<!-- 所有方法都是事务方法 -->
+			<tx:method name="*"/>
+			<!-- 以get开始的所有方法 -->
+			<tx:method name="get*" read-only="true"/>
+		</tx:attributes>
+	</tx:advice>
+</beans>
