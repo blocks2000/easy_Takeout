@@ -1,0 +1,114 @@
+*{
+	margin:0;
+	padding:0;
+}
+
+
+body{
+	height:100vh;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	background:linear-gradient(45deg,rgb(181,154,254),rgb(245,189,253)) fixed;
+}
+
+.container{
+	position:relative;
+	width:50rem;  /*閹貉冨煑鐎硅棄瀹�*/
+	background:white;
+}
+
+.container img{
+	width:70rems;
+}
+
+.switch span{
+	color:#ccc;
+	font-size:1.4rem;
+	cursor:pointer;
+}
+
+.switch span.active{
+	color:rgb(181,154,254);
+	
+}
+
+.panel{
+	width:50%;/*閹貉冨煑鏉堟挸鍙嗛崣棰佺秴缂冿拷*/
+	margin:10rem 0 0;
+	position:absolute;
+	right:0;
+	top:-20%;
+	display:flex;
+	justify-content:center;
+}
+
+form{
+	width:12rem;
+	margin:3rem 0 0;
+}
+
+form .input{
+	position:relative;
+	opacity:1;
+	width:100%;
+	height:2rem;
+	margin:2rem 0;
+	transition:.4s;
+}
+
+.input input{
+	outline:none;
+	width:100%;
+	border:none;
+	border-bottom:.1rem solid rgb(181,154,254);
+}
+
+.input::after{
+	content:attr(placeholder);
+	position:absolute;
+	left:0;
+	top:-20%;
+	font-size:1.3rem;
+	color:rgb(181,154,254);
+	transition:.3s;
+}
+
+.input.focus::after{
+	top:-70%;
+	font-size:1rem;
+}
+
+
+.login .input#address,
+.login .input#phone,
+.login .input#sex,
+.login .input#type{
+	margin:0;
+	height:0;
+	opacity:0;
+	
+}
+
+form span{
+	display:block;
+	color:rgb(110,89,167);
+	font-size:.8rem;
+	cursor:pointer;
+}
+
+form button{
+	border:none;
+	outline:none;
+	margin:2rem 0 0;
+	width:100%;
+	height:3.5rem;
+	border-radius:3rem;
+	background:linear-gradient(90deg,rgb(181,154,254),rgb(245,189,253));
+	box-shadow:0 0 8px rgb(181,154,254);
+	cursor:pointer;
+	color:white;
+}
+
+
+
